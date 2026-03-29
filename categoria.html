@@ -17,6 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <link rel="stylesheet" href="news-style.css">
+    <link rel="icon" type="image/png" href="FavIconAtsom.png">
     <style>
         .category-card-item {
             background: white;
@@ -96,8 +97,8 @@
             <a href="categoria.html?cat=Preferiti" class="cat-btn radius-mid" id="cat-Preferiti">Preferiti</a>
             <a href="categoria.html?cat=Categorie" class="cat-btn radius-mid" id="cat-Categorie">Categorie</a>
             <div class="search-pill radius-right">
-                <svg id="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer;">
+                <svg id="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer;">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
@@ -159,11 +160,11 @@
 
         async function initPage() {
             const grid = document.getElementById('news-grid');
-            
+
             // Search Logic (Global)
             const searchInput = document.getElementById('search-input');
             const searchIcon = document.getElementById('search-icon');
-            
+
             const handleSearch = () => {
                 const query = searchInput.value.trim();
                 if (query) {

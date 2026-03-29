@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATSOMnews Admin Panel</title>
-    
+
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
     <!-- Firebase SDK (Standard CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    
+
     <link rel="stylesheet" href="admin-style.css">
+    <link rel="icon" type="image/png" href="FavIconAtsom.png">
 </head>
+
 <body class="admin-body">
 
     <!-- Login Section -->
@@ -40,17 +44,28 @@
 
     <!-- Admin Dashboard Section -->
     <div id="admin-section" style="display: none; width: 100%; height: 100vh; flex-direction: row;">
-        
+
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <img src="atsom.png" alt="logo" class="sidebar-logo">
             <div class="sidebar-nav">
                 <div class="nav-item active">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
                     Dashboard
                 </div>
                 <div class="nav-item" onclick="logout()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
                     Logout
                 </div>
             </div>
@@ -64,7 +79,11 @@
             <header class="admin-header">
                 <h2>Notizie</h2>
                 <button class="btn-add" onclick="openEditor()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                     Nuova Notizia
                 </button>
             </header>
@@ -95,7 +114,11 @@
             <header class="editor-header">
                 <h3 id="editor-title">Nuova Notizia</h3>
                 <button class="action-btn" onclick="closeEditor()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </header>
             <div class="editor-body">
@@ -119,27 +142,48 @@
                         </div>
                         <div class="add-block-btns">
                             <button type="button" class="btn-add-block" onclick="addBlock('p')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3H7a4 4 0 1 0 0 8h10a4 4 0 1 1 0 8H7"></path></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M17 3H7a4 4 0 1 0 0 8h10a4 4 0 1 1 0 8H7"></path>
+                                </svg>
                                 Paragrafo
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('h2')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 12h12M6 20V4M18 20V4"></path></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M6 12h12M6 20V4M18 20V4"></path>
+                                </svg>
                                 Titolo (H2)
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('h3')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h8M4 18V6M12 18V6M17 12h5M17 18V6M22 18V6"></path></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M4 12h8M4 18V6M12 18V6M17 12h5M17 18V6M22 18V6"></path>
+                                </svg>
                                 Sottotitolo (H3)
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('img')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
                                 Immagine
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('youtube')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path
+                                        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z">
+                                    </path>
+                                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                                </svg>
                                 Video YouTube
                             </button>
                         </div>
-                        <button type="button" id="toggle-raw-btn" class="btn-raw-html" onclick="toggleRawMode()">Passa a HTML Manuale</button>
+                        <button type="button" id="toggle-raw-btn" class="btn-raw-html" onclick="toggleRawMode()">Passa a
+                            HTML Manuale</button>
                         <textarea id="news-content" style="display:none; margin-top:10px;" rows="6"></textarea>
                     </div>
                     <div class="form-group">
@@ -166,10 +210,13 @@
                         </label>
                     </div>
                     <!-- Meta Info Section -->
-                    <div id="editor-meta-info" class="form-group full-width" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85rem; color: #718096; display: none;">
+                    <div id="editor-meta-info" class="form-group full-width"
+                        style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85rem; color: #718096; display: none;">
                         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                            <span>Creato da: <strong id="meta-created-by" style="color: #4a5568;">-</strong> il <span id="meta-created-at">-</span></span>
-                            <span>Ultima modifica: <strong id="meta-updated-by" style="color: #4a5568;">-</strong> il <span id="meta-updated-at">-</span></span>
+                            <span>Creato da: <strong id="meta-created-by" style="color: #4a5568;">-</strong> il <span
+                                    id="meta-created-at">-</span></span>
+                            <span>Ultima modifica: <strong id="meta-updated-by" style="color: #4a5568;">-</strong> il
+                                <span id="meta-updated-at">-</span></span>
                         </div>
                     </div>
                 </form>
@@ -219,7 +266,7 @@
             container.innerHTML = contentBlocks.map((b, idx) => {
                 let inputHtml = "";
                 let typeColor = "#a0aec0";
-                
+
                 if (b.type === 'p') {
                     inputHtml = `<textarea rows="3" placeholder="Testo del paragrafo..." oninput="updateBlockValue('${b.id}', this.value)">${b.value}</textarea>`;
                 } else if (b.type === 'h2' || b.type === 'h3') {
@@ -252,7 +299,7 @@
                 </div>
             `;
             }).join('');
-            
+
             if (contentBlocks.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:#a0aec0; margin:0;">Inizia ad aggiungere dei blocchi di testo...</p>';
             }
@@ -321,7 +368,7 @@
             contentBlocks = [];
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
-            
+
             Array.from(tempDiv.children).forEach(el => {
                 const tag = el.tagName.toLowerCase();
                 if (['p', 'h2', 'h3'].includes(tag)) {
@@ -339,7 +386,7 @@
                     }
                 }
             });
-            
+
             // If empty after parsing, maybe it's just raw text
             if (contentBlocks.length === 0 && html.trim()) {
                 addBlock('p', html);
@@ -350,16 +397,16 @@
             const text = html.replace(/<[^>]*>?/gm, ' ');
             const words = text.trim().split(/\s+/).filter(s => s).length;
             const rawMin = words / 200;
-            
+
             if (rawMin < 0.4) return "meno di 1 min";
-            
+
             const intPart = Math.floor(rawMin);
             const decPart = rawMin - intPart;
-            
+
             if (decPart >= 0.2 && decPart <= 0.8) {
                 return (intPart === 0 ? "meno di un minuto" : intPart + (intPart === 1 ? " min" : " min") + " e mezzo");
             }
-            
+
             const finalMin = Math.round(rawMin);
             return finalMin + (finalMin === 1 ? " min" : " min");
         }
@@ -378,7 +425,7 @@
             e.preventDefault();
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            
+
             const result = await newsApi.login(user, pass);
             if (result) {
                 currentUser = result;
@@ -407,11 +454,11 @@
             tbody.innerHTML = news.map(n => {
                 const date = n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('it-IT') : '-';
                 const modDate = n.updatedAt ? new Date(n.updatedAt.seconds * 1000).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-                
+
                 // Compatibility with old "authorName" field
                 const creator = n.createdBy || n.authorName || 'Sconosciuto';
                 const modifier = n.updatedBy || creator;
-                
+
                 const statusClass = n.status === 'published' ? 'status-published' : 'status-private';
                 return `
                     <tr>
@@ -448,14 +495,14 @@
             const overlay = document.getElementById('editor-overlay');
             const form = document.getElementById('news-form');
             form.reset();
-            
+
             if (id) {
                 document.getElementById('editor-title').textContent = "Modifica Notizia";
                 const news = await newsApi.getNewsById(id);
                 document.getElementById('news-title').value = news.title || '';
                 document.getElementById('news-subtitle').value = news.subtitle || '';
                 document.getElementById('news-summary').value = news.summary || '';
-                
+
                 // Content
                 const content = news.content || '';
                 document.getElementById('news-content').value = content;
@@ -479,7 +526,7 @@
                 const createdAt = news.createdAt ? new Date(news.createdAt.seconds * 1000).toLocaleString('it-IT') : '-';
                 const modifier = news.updatedBy || creator;
                 const updatedAt = news.updatedAt ? new Date(news.updatedAt.seconds * 1000).toLocaleString('it-IT') : '-';
-                
+
                 document.getElementById('meta-created-by').textContent = creator;
                 document.getElementById('meta-created-at').textContent = createdAt;
                 document.getElementById('meta-updated-by').textContent = modifier;
@@ -495,7 +542,7 @@
                 document.querySelector('.add-block-btns').style.display = 'flex';
                 document.getElementById('news-content').style.display = 'none';
             }
-            
+
             overlay.style.display = 'flex';
         };
 
@@ -506,7 +553,7 @@
         window.saveNews = async () => {
             const finalContent = isRawMode ? document.getElementById('news-content').value : getHTMLFromBlocks();
             const readingTime = calculateReadingTime(finalContent);
-            
+
             const data = {
                 title: document.getElementById('news-title').value,
                 subtitle: document.getElementById('news-subtitle').value,
@@ -559,4 +606,5 @@
         checkSession();
     </script>
 </body>
+
 </html>

@@ -28,23 +28,7 @@ export const newsApi = {
      * Fetch featured news for the hero section.
      */
     async getFeaturedNews() {
-        try {
-            const snapshot = await db.collection("notizie")
-                .where("status", "==", "published")
-                .where("isFeatured", "==", true)
-                .orderBy("createdAt", "desc")
-                .limit(1)
-                .get();
-            if (snapshot.empty) {
-                // Return latest if no featured news
-                return this.getLatestNews(1);
-            }
-            const doc = snapshot.docs[0];
-            return [{ id: doc.id, ...doc.data() }];
-        } catch (error) {
-            console.error("Error fetching featured news:", error);
-            return [];
-        }
+        return this.getLatestNews(1);
     },
 
     /**
@@ -256,6 +240,53 @@ export const newsApi = {
         } catch (error) {
             console.error("Error searching news:", error);
             return [];
+        }
+    },
+
+    /**
+     * Get site maintenance status.
+     */
+    async getMaintenanceStatus() {
+        try {
+            const doc = await db.collection("impostazioni").doc("sito").get();
+            if (!doc.exists) return { isMaintenance: false };
+            return doc.data();
+        } catch (error) {
+            console.error("Error fetching maintenance status:", error);
+            return { isMaintenance: false };
+        }
+    },
+
+    /**
+     * Update site maintenance status (Admin).
+     */
+    async updateMaintenanceStatus(isMaintenance, message = "") {
+        try {
+            const docRef = db.collection("impostazioni").doc("sito");
+            const data = { isMaintenance };
+            if (message) data.maintenanceMessage = message;
+            
+            await docRef.set(data, { merge: true });
+            return true;
+        } catch (error) {
+            console.error("Error updating maintenance status:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Increment or decrement likes for a news document.
+     */
+    async toggleLike(id, increment) {
+        try {
+            const docRef = db.collection("notizie").doc(id);
+            await docRef.update({
+                likes: firebase.firestore.FieldValue.increment(increment)
+            });
+            return true;
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            return false;
         }
     }
 };

@@ -355,6 +355,7 @@ body {
 
 .tag-list {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
@@ -404,7 +405,9 @@ body {
     position: absolute;
     bottom: 10px;
     left: 10px;
+    right: 10px;
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
 }
 
@@ -577,10 +580,18 @@ body {
 
     .hero-news-card {
         flex-direction: column;
+        min-height: auto;
     }
 
     .hero-img-box {
-        height: 200px;
+        flex: none;
+        width: 100%;
+        height: 220px;
+    }
+
+    .hero-content {
+        flex: none;
+        padding: 20px;
     }
 }
 
@@ -770,5 +781,243 @@ body {
 @media (max-width: 900px) {
     .floating-article-bar {
         display: flex;
+    }
+}
+
+/* Social Media Embeds Styling */
+.article-social-embed {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.article-social-embed::-webkit-scrollbar {
+    display: none;
+}
+
+.instagram-media,
+.twitter-tweet,
+.fb-post {
+    margin: 0 auto !important;
+}
+
+/* Ensure YouTube matches the style */
+.article-video-wrapper {
+    box-shadow: var(--shadow-premium);
+    overflow: hidden;
+}
+
+/* --- Like Feature UI Enhancements --- */
+.actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-btn.liked {
+    background: var(--atsom-coral) !important;
+    color: white !important;
+    border: none;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.action-btn.liked svg {
+    fill: white;
+}
+
+/* Pulsing pop animation triggered when button is active/clicked */
+.action-btn.pop-anim svg {
+    animation: heartPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.like-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: white;
+    height: 44px;
+    /* Pareggia l'altezza del pulsante */
+    min-width: 20px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0;
+}
+
+@keyframes heartPop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* --- Custom ATSOM Video Player --- */
+.atsom-video-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    margin: 1.5rem 0;
+    cursor: pointer;
+    line-height: 0;
+}
+
+.atsom-video-wrapper video {
+    width: 100%;
+    height: auto !important;
+    display: block;
+}
+
+/* Hide default controls */
+video::-webkit-media-controls {
+    display: none !important;
+}
+
+.video-controls-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px 20px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.atsom-video-wrapper:hover .video-controls-overlay,
+.atsom-video-wrapper.mouse-moving .video-controls-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-time-row {
+    display: none;
+}
+
+.video-time-info {
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.video-progress-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.video-progress-played {
+    height: 12px;
+    background: #9d4040;
+    /* Parte già riprodotta: Rosso scurito/marrone */
+    border-radius: 3px;
+    flex: 0 1 0%;
+    min-width: 0;
+}
+
+.video-progress-thumb {
+    width: 3px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.video-progress-unplayed {
+    height: 12px;
+    background: var(--atsom-coral);
+    /* Parte non riprodotta: Corallo pieno */
+    border-radius: 3px;
+    flex: 100 1 0%;
+    min-width: 0;
+}
+
+.video-volume-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--atsom-coral);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.video-volume-btn:hover {
+    transform: scale(1.1);
+}
+
+.video-volume-btn svg {
+    color: white;
+    fill: white;
+}
+
+/* Play/Pause Central Animation */
+.video-center-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--atsom-coral);
+    border-radius: 50%;
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+}
+
+.video-center-icon.animate-pop {
+    animation: centerIconPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes centerIconPop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.3);
     }
 }

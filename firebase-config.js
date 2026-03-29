@@ -3,7 +3,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDH1MbfmYkqrVXIrPQTdPk4Fl3uJ8UdzI4",
     authDomain: "atsomnews.firebaseapp.com",
     projectId: "atsomnews",
-    storageBucket: "atsomnews.firebasestorage.app",
+    storageBucket: "atsomstorage.firebasestorage.app",
     messagingSenderId: "356172763397",
     appId: "1:356172763397:web:d31f6c6397149b57ea676c"
 };
@@ -14,5 +14,6 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore();
+const storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
-export { db };
+export { db, storage };

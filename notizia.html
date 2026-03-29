@@ -15,6 +15,7 @@
     <!-- Firebase SDK (Standard CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
     <link rel="stylesheet" href="news-style.css">
     <link rel="icon" type="image/png" href="FavIconAtsom.png">
@@ -34,6 +35,11 @@
 </head>
 
 <body>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/it_IT/sdk.js#xfbml=1&version=v19.0"></script>
+    <script async src="https://www.instagram.com/embed.js"></script>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 
     <div class="container-news">
 
@@ -138,6 +144,15 @@
                     </div>
 
                     <div class="actions-row">
+                        <div id="btn-like" class="action-btn" onclick="handleLikeToggle()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span id="like-count" class="like-counter">0</span>
                         <div id="btn-share" class="action-btn">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -191,25 +206,31 @@
 
     </div>
 
-    <!-- Firebase Config & API -->
+    <!-- Firebase Config, API & Maintenance Check -->
     <script src="firebase-config.js" type="module"></script>
+    <script src="maintenance-mode.js" type="module"></script>
     <script type="module">
         import { newsApi } from './news-api.js';
-
+        
         const urlParams = new URLSearchParams(window.location.search);
         const newsId = urlParams.get('id');
 
-        if (!newsId) {
-            window.location.href = 'index.html';
-        }
+        let currentNews = null;
 
         async function initPage() {
-            // Admin Link
-            const adminBtn = document.querySelector('.user-icon-btn');
-            if (adminBtn) {
-                adminBtn.style.cursor = 'pointer';
-                adminBtn.onclick = () => window.location.href = 'admin.html';
+            if (!newsId) {
+                window.location.href = 'index.html';
+                return;
             }
+
+            // 0. Check Maintenance
+            try {
+                const status = await newsApi.getMaintenanceStatus();
+                if (status && status.isMaintenance && !window.location.pathname.includes('admin.html')) {
+                    // maintenance-mode.js already handles this if loaded, 
+                    // but we can double check here if needed.
+                }
+            } catch (e) {}
 
             // 1. Ticker Dinamico
             async function updateTicker() {
@@ -228,13 +249,14 @@
             }
             updateTicker();
 
-            // Article Content
+            // 2. Article Content
             const news = await newsApi.getNewsById(newsId);
             if (!news) {
                 alert("Notizia non trovata");
                 window.location.href = 'index.html';
                 return;
             }
+            currentNews = news;
 
             // Populate Main Content
             document.title = `${news.title} | ATSOMnews`;
@@ -244,6 +266,14 @@
             document.getElementById('publish-date').textContent = dateStr;
             document.getElementById('article-body').innerHTML = news.content;
             document.getElementById('floating-title').textContent = news.title;
+            document.getElementById('like-count').textContent = news.likes || 0;
+
+            // Re-process social embeds
+            setTimeout(() => {
+                if (window.instgrm) window.instgrm.Embeds.process();
+                if (window.twttr) window.twttr.widgets.load();
+                if (window.FB) window.FB.XFBML.parse();
+            }, 100);
 
             // Calc reading time (rough)
             const words = news.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
@@ -253,26 +283,69 @@
             // Populate Sticky Panel
             document.getElementById('panel-img').src = news.coverImage;
             document.getElementById('panel-title').textContent = news.title;
-            document.getElementById('panel-tags').innerHTML = (news.tags || []).map(t => `<span class="tag-pill" style="background: rgba(255,255,255,0.2); color: white;">${t}</span>`).join('');
-
+            // Note: tags are handled via related news logic usually, but we can add them to panel if needed
+            
             // Related News
             const related = await newsApi.getRelatedNews(news.tags, news.id);
             const relatedGrid = document.getElementById('related-grid');
-            relatedGrid.innerHTML = related.map(item => {
-                const dStr = item.publishedAt ? new Date(item.publishedAt.seconds * 1000).toLocaleString('it-IT') : '';
-                return `
-                    <div class="news-card" onclick="window.location.href='notizia.html?id=${item.id}'">
-                        <div class="card-img-wrapper" style="height: 160px;">
-                            <img src="${item.coverImage}" alt="${item.title}">
+            if (relatedGrid) {
+                relatedGrid.innerHTML = related.map(item => {
+                    const dStr = item.publishedAt ? new Date(item.publishedAt.seconds * 1000).toLocaleString('it-IT') : '';
+                    return `
+                        <div class="news-card" onclick="window.location.href='notizia.html?id=${item.id}'">
+                            <div class="card-img-wrapper" style="height: 160px;">
+                                <img src="${item.coverImage}" alt="${item.title}">
+                            </div>
+                            <div class="card-body">
+                                <h3 style="font-size: 0.95rem;">${item.title}</h3>
+                                <div class="news-date">${dStr}</div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h3 style="font-size: 0.95rem;">${item.title}</h3>
-                            <div class="news-date">${dStr}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            }
+
+            checkIfLiked(newsId);
+            syncSaveStatus();
+            initCustomVideoPlayers();
         }
+
+        function checkIfLiked(id) {
+            const likedList = JSON.parse(localStorage.getItem('atsom_likes') || '[]');
+            const btnLike = document.getElementById('btn-like');
+            if (likedList.includes(id)) {
+                btnLike.classList.add('liked');
+            }
+        }
+
+        window.handleLikeToggle = async () => {
+            if (!currentNews) return;
+            const id = currentNews.id;
+            const btnLike = document.getElementById('btn-like');
+            const counter = document.getElementById('like-count');
+            const likedList = JSON.parse(localStorage.getItem('atsom_likes') || '[]');
+            const isLiked = likedList.includes(id);
+
+            // Trigger animation
+            btnLike.classList.add('pop-anim');
+            setTimeout(() => btnLike.classList.remove('pop-anim'), 450);
+
+            // Optimistic UI update
+            let currentLikes = parseInt(counter.textContent);
+            if (isLiked) {
+                btnLike.classList.remove('liked');
+                counter.textContent = Math.max(0, currentLikes - 1);
+                const newList = likedList.filter(item => item !== id);
+                localStorage.setItem('atsom_likes', JSON.stringify(newList));
+                await newsApi.toggleLike(id, -1);
+            } else {
+                btnLike.classList.add('liked');
+                counter.textContent = currentLikes + 1;
+                likedList.push(id);
+                localStorage.setItem('atsom_likes', JSON.stringify(likedList));
+                await newsApi.toggleLike(id, 1);
+            }
+        };
 
         // Scroll & Floating Bar Logic
         window.onscroll = function () {
@@ -368,10 +441,112 @@
         // Check if already saved
         syncSaveStatus();
 
-        // Add toast container
-        const tc = document.createElement('div');
-        tc.id = 'toast-container';
-        document.body.appendChild(tc);
+        function initCustomVideoPlayers() {
+            const articleBody = document.getElementById('article-body');
+            if (!articleBody) return;
+
+            const videos = articleBody.querySelectorAll('video');
+            videos.forEach(video => {
+                // Remove original controls
+                video.removeAttribute('controls');
+                
+                // Create Wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'atsom-video-wrapper';
+                video.parentNode.insertBefore(wrapper, video);
+                wrapper.appendChild(video);
+
+                // Create Controls Overlay
+                const controls = document.createElement('div');
+                controls.className = 'video-controls-overlay';
+                controls.innerHTML = `
+                    <span class="video-time-info">00:00 / 00:00</span>
+                    <div class="video-progress-container">
+                        <div class="video-progress-played"></div>
+                        <div class="video-progress-thumb"></div>
+                        <div class="video-progress-unplayed"></div>
+                    </div>
+                    <div class="video-volume-btn" title="Muto/Audio">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </div>
+                `;
+                
+                // Overlay centrale per feedback Play/Pausa
+                const centerIcon = document.createElement('div');
+                centerIcon.className = 'video-center-icon';
+
+                wrapper.appendChild(centerIcon);
+                wrapper.appendChild(controls);
+
+                const timeInfo = controls.querySelector('.video-time-info');
+                const progressContainer = controls.querySelector('.video-progress-container');
+                const playedBar = controls.querySelector('.video-progress-played');
+                const unplayedBar = controls.querySelector('.video-progress-unplayed');
+                const volumeBtn = controls.querySelector('.video-volume-btn');
+
+                const playSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>';
+                const pauseSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="white" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>';
+
+                function triggerCenterIcon(svg) {
+                    centerIcon.innerHTML = svg;
+                    centerIcon.classList.remove('animate-pop');
+                    void centerIcon.offsetWidth; // trigger reflow
+                    centerIcon.classList.add('animate-pop');
+                }
+
+                // Play/Pause on click
+                video.addEventListener('click', () => {
+                    if (video.paused) {
+                        video.play();
+                        triggerCenterIcon(playSvg);
+                    } else {
+                        video.pause();
+                        triggerCenterIcon(pauseSvg);
+                    }
+                });
+
+                // Update Progress & Time
+                video.addEventListener('timeupdate', () => {
+                    const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+                    playedBar.style.flex = `${percent} 1 0%`;
+                    unplayedBar.style.flex = `${100 - percent} 1 0%`;
+                    
+                    const cur = formatTime(video.currentTime);
+                    const dur = formatTime(video.duration || 0);
+                    timeInfo.textContent = `${cur} / ${dur}`;
+                });
+
+                // Seeking
+                progressContainer.addEventListener('click', (e) => {
+                    const rect = progressContainer.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    video.currentTime = pos * video.duration;
+                });
+
+                // Volume Toggle
+                volumeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    video.muted = !video.muted;
+                    volumeBtn.style.opacity = video.muted ? '0.6' : '1';
+                });
+
+                // Auto-Hide Controls
+                let hideTimeout;
+                wrapper.addEventListener('mousemove', () => {
+                    wrapper.classList.add('mouse-moving');
+                    clearTimeout(hideTimeout);
+                    hideTimeout = setTimeout(() => {
+                        wrapper.classList.remove('mouse-moving');
+                    }, 2000);
+                });
+            });
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
 
         initPage();
 
@@ -394,7 +569,5 @@
         }
     </script>
 </body>
-
-</html>
 
 </html>

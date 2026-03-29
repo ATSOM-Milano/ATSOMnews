@@ -109,8 +109,9 @@
 
     </div>
 
-    <!-- Firebase Config & API -->
+    <!-- Firebase Config, API & Maintenance Check -->
     <script src="firebase-config.js" type="module"></script>
+    <script src="maintenance-mode.js" type="module"></script>
     <script type="module">
         import { newsApi } from './news-api.js';
 
@@ -141,8 +142,11 @@
             }
             updateTicker();
 
-            // 2. Featured
-            const featured = await newsApi.getFeaturedNews();
+            // 2. Featured & Grid
+            const allNews = await newsApi.getNewsByCategory('Tutte');
+            const featured = allNews.slice(0, 1);
+            const gridNews = allNews.slice(1);
+
             const featuredContainer = document.getElementById('featured-news-container');
             if (featured.length > 0) {
                 const item = featured[0];
@@ -165,9 +169,8 @@
             }
 
             // 3. Grid
-            const allNews = await newsApi.getNewsByCategory('Tutte');
             const grid = document.getElementById('news-grid');
-            grid.innerHTML = allNews.map(item => {
+            grid.innerHTML = gridNews.map(item => {
                 const dateStr = item.publishedAt ? new Date(item.publishedAt.seconds * 1000).toLocaleString('it-IT') : '';
                 return `
                     <div class="news-card" onclick="window.location.href='notizia.html?id=${item.id}'">

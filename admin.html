@@ -15,6 +15,7 @@
     <!-- Firebase SDK (Standard CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
     <link rel="stylesheet" href="admin-style.css">
     <link rel="icon" type="image/png" href="FavIconAtsom.png">
@@ -49,15 +50,35 @@
         <aside class="admin-sidebar">
             <img src="atsom.png" alt="logo" class="sidebar-logo">
             <div class="sidebar-nav">
-                <div class="nav-item active">
+                
+                <div class="nav-item-header">CONTENUTI</div>
+                <div class="nav-item active" id="nav-notizie" onclick="switchAdminSection('notizie')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
-                    Dashboard
+                    Notizie
+                </div>
+                <div class="nav-item" id="nav-media" onclick="switchAdminSection('media')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Gestione Media
+                </div>
+
+                <div class="nav-item-header" style="margin-top:20px;">SISTEMA</div>
+                <div class="nav-item" id="nav-maintenance" onclick="toggleMaintenanceUI()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                    </svg>
+                    Manutenzione: <span id="status-maintenance-text" style="margin-left:5px; font-weight:700;">OFF</span>
                 </div>
                 <div class="nav-item" onclick="logout()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -76,34 +97,70 @@
 
         <!-- Main Content -->
         <main class="admin-main">
-            <header class="admin-header">
-                <h2>Notizie</h2>
-                <button class="btn-add" onclick="openEditor()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Nuova Notizia
-                </button>
-            </header>
+            <!-- SEZIONE NOTIZIE -->
+            <div id="section-notizie">
+                <header class="admin-header">
+                    <h2>Notizie</h2>
+                    <button class="btn-add" onclick="openEditor()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Nuova Notizia
+                    </button>
+                </header>
 
-            <div class="data-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Titolo</th>
-                            <th>Creatore</th>
-                            <th>Ultima Modifica</th>
-                            <th>Stato</th>
-                            <th>Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody id="news-table-body">
-                        <!-- Filled via JS -->
-                    </tbody>
-                </table>
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Titolo</th>
+                                <th>Creatore</th>
+                                <th>Ultima Modifica</th>
+                                <th>Stato</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="news-table-body">
+                            <!-- Filled via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SEZIONE MEDIA -->
+            <div id="section-media" style="display: none;">
+                <header class="admin-header">
+                    <h2>Gestione Media</h2>
+                    <button class="action-btn" onclick="loadMediaLibrary()" title="Aggiorna Libreria">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    </button>
+                </header>
+                
+                <div class="media-drop-zone" onclick="document.getElementById('media-upload-input').click()" ondragover="event.preventDefault(); this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault(); this.classList.remove('drag-over'); handleMediaDragDrop(event.dataTransfer.files)">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; color: var(--atsom-dark-grey);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <p style="margin: 0; font-weight: 600; color: #4a5568;">Trascina qui i tuoi media o fai clic per caricarli</p>
+                    <small style="color: #718096; display: block; margin-top: 5px;">Dimensioni massime: 20MB per file (JPG, PNG, GIF, MP4)</small>
+                    <p id="media-upload-progress" style="margin-top: 10px; font-weight: bold; color: var(--atsom-coral); display: none;"></p>
+                    <input type="file" id="media-upload-input" accept="image/*,video/mp4" multiple style="display:none;" onchange="handleMediaDragDrop(this.files)">
+                </div>
+
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 80px; text-align: center;">Anteprima</th>
+                                <th>Nome File</th>
+                                <th style="width: 100px; text-align: right;">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="media-table-body">
+                            <tr><td colspan="3" style="text-align:center; padding: 40px; color: var(--atsom-dark-grey);">Caricamento libreria media in corso...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -141,45 +198,46 @@
                             <!-- Blocks will be added here -->
                         </div>
                         <div class="add-block-btns">
+                            <!-- Gruppo Testo -->
                             <button type="button" class="btn-add-block" onclick="addBlock('p')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <path d="M17 3H7a4 4 0 1 0 0 8h10a4 4 0 1 1 0 8H7"></path>
-                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3H7a4 4 0 1 0 0 8h10a4 4 0 1 1 0 8H7"></path></svg>
                                 Paragrafo
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('h2')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <path d="M6 12h12M6 20V4M18 20V4"></path>
-                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 12h12M6 20V4M18 20V4"></path></svg>
                                 Titolo (H2)
                             </button>
                             <button type="button" class="btn-add-block" onclick="addBlock('h3')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <path d="M4 12h8M4 18V6M12 18V6M17 12h5M17 18V6M22 18V6"></path>
-                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h8M4 18V6M12 18V6M17 12h5M17 18V6M22 18V6"></path></svg>
                                 Sottotitolo (H3)
                             </button>
+
+                            <!-- Gruppo Media -->
                             <button type="button" class="btn-add-block" onclick="addBlock('img')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                 Immagine
                             </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('video')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><path d="M8 21h8M12 17v4"></path><polygon points="10 8 16 11 10 14 10 8"></polygon></svg>
+                                Video (Upload)
+                            </button>
+
+                            <!-- Gruppo Embed Social -->
                             <button type="button" class="btn-add-block" onclick="addBlock('youtube')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <path
-                                        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z">
-                                    </path>
-                                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-                                </svg>
-                                Video YouTube
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                                YouTube
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('instagram')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                                Instagram
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('facebook')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                                Facebook
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('twitter')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                                X (Twitter)
                             </button>
                         </div>
                         <button type="button" id="toggle-raw-btn" class="btn-raw-html" onclick="toggleRawMode()">Passa a
@@ -187,12 +245,24 @@
                         <textarea id="news-content" style="display:none; margin-top:10px;" rows="6"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="news-cover">Immagine Principale (URL)</label>
-                        <input type="text" id="news-cover" placeholder="https://..." required>
+                        <label for="news-cover">Immagine Principale (URL o Upload)</label>
+                        <div class="input-with-upload">
+                            <input type="text" id="news-cover" placeholder="https://..." required>
+                            <button type="button" class="btn-upload-small" style="background:var(--atsom-dark-blue); border-color:var(--atsom-dark-blue); color:white;" onclick="window.openCloudSelector('news-cover', 'img')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                                Cloud
+                            </button>
+                            <label class="btn-upload-small">
+                                <input type="file" accept="image/*" onchange="window.handleFileUpload(this, 'news-cover')" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                Carica
+                            </label>
+                        </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative;">
                         <label for="news-tags">Tag (separati da virgola)</label>
-                        <input type="text" id="news-tags" placeholder="Milano, Metro, ...">
+                        <input type="text" id="news-tags" placeholder="Milano, Metro, ..." autocomplete="off">
+                        <div id="tag-suggestions" class="tag-suggestions" style="display:none;"></div>
                     </div>
                     <div class="form-group">
                         <label for="news-status">Stato</label>
@@ -202,9 +272,6 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="news-featured"> In Evidenza (Hero Section)
-                        </label>
                         <label style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
                             <input type="checkbox" id="news-breaking"> Breaking News
                         </label>
@@ -228,15 +295,154 @@
         </div>
     </div>
 
+    <!-- Custom Modal Overlay -->
+    <div id="custom-modal-overlay" class="editor-overlay" style="z-index: 10000;">
+        <div class="editor-modal" style="max-width: 400px; height: auto; text-align: center; padding: 2rem;">
+            <h3 id="custom-modal-title" style="margin-bottom: 1rem; color: #1a202c; font-size: 1.25rem;">Avviso</h3>
+            <p id="custom-modal-message" style="margin-bottom: 2rem; color: #4a5568; line-height: 1.5; font-size: 0.95rem; word-break: break-word;"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="custom-modal-btn-cancel" class="btn-cancel" style="display:none; padding: 0.5rem 1.5rem; width: auto;">Annulla</button>
+                <button id="custom-modal-btn-confirm" class="btn-save" style="padding: 0.5rem 1.5rem; width: auto;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Selector Modal -->
+    <div id="cloud-selector-modal" class="editor-overlay" style="z-index: 10001; display:none;">
+        <div class="editor-modal" style="width: 80%; max-width: 900px; height: 80vh; display: flex; flex-direction: column;">
+            <header class="editor-header">
+                <h3 id="cloud-selector-title">Seleziona dal Cloud</h3>
+                <button class="action-btn" onclick="document.getElementById('cloud-selector-modal').style.display = 'none'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </header>
+            <div class="editor-body" style="flex: 1; overflow-y: auto; padding: 20px; background:#f7fafc;">
+                <div class="media-grid" id="cloud-selector-grid">
+                    <div style="text-align:center; padding: 40px; color: var(--atsom-dark-grey); grid-column: 1 / -1;">Caricamento dal cloud in corso...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Config & API -->
     <script src="firebase-config.js" type="module"></script>
     <script type="module">
         import { newsApi } from './news-api.js';
+        import { storage } from './firebase-config.js';
+
+        // Custom Modal Logic
+        window.customAlert = (message, title = "Avviso") => {
+            return new Promise(resolve => {
+                const overlay = document.getElementById('custom-modal-overlay');
+                document.getElementById('custom-modal-title').textContent = title;
+                document.getElementById('custom-modal-message').innerHTML = message.replace(/\n/g, '<br>');
+                
+                const btnConfirm = document.getElementById('custom-modal-btn-confirm');
+                const btnCancel = document.getElementById('custom-modal-btn-cancel');
+                
+                btnCancel.style.display = 'none';
+                btnConfirm.textContent = 'OK';
+                // Assicuriamoci che non usi le classi rosse
+                btnConfirm.className = 'btn-save';
+                btnConfirm.style.backgroundColor = 'var(--atsom-coral)';
+                btnConfirm.style.borderColor = 'var(--atsom-coral)';
+                btnConfirm.style.color = 'white';
+                
+                btnConfirm.onclick = () => {
+                    overlay.style.display = 'none';
+                    resolve();
+                };
+                
+                overlay.style.display = 'flex';
+            });
+        };
+
+        window.customConfirm = (message, title = "Conferma Azione", danger = false) => {
+            return new Promise(resolve => {
+                const overlay = document.getElementById('custom-modal-overlay');
+                document.getElementById('custom-modal-title').textContent = title;
+                document.getElementById('custom-modal-message').innerHTML = message.replace(/\n/g, '<br>');
+                
+                const btnConfirm = document.getElementById('custom-modal-btn-confirm');
+                const btnCancel = document.getElementById('custom-modal-btn-cancel');
+                
+                btnCancel.style.display = 'block';
+                btnCancel.onclick = () => {
+                    overlay.style.display = 'none';
+                    resolve(false);
+                };
+                
+                btnConfirm.textContent = danger ? 'Elimina' : 'Conferma';
+                btnConfirm.className = danger ? 'btn-delete-media' : 'btn-save';
+                
+                if (danger) {
+                    btnConfirm.style.backgroundColor = '#fff5f5';
+                    btnConfirm.style.color = '#e53e3e';
+                    btnConfirm.style.borderColor = '#fed7d7';
+                } else {
+                    btnConfirm.style.backgroundColor = 'var(--atsom-coral)';
+                    btnConfirm.style.color = 'white';
+                    btnConfirm.style.borderColor = 'var(--atsom-coral)';
+                }
+                
+                btnConfirm.onclick = () => {
+                    overlay.style.display = 'none';
+                    resolve(true);
+                };
+                
+                overlay.style.display = 'flex';
+            });
+        };
 
         let currentUser = null;
         let editingId = null;
         let contentBlocks = [];
         let isRawMode = false;
+        let isUploading = false;
+
+        // Firebase Storage Upload Logic
+        window.uploadToStorage = async (file, path) => {
+            if (!file) return null;
+            const storageRef = storage.ref();
+            const fileRef = storageRef.child(path);
+            
+            setUploadState(true);
+            try {
+                const snapshot = await fileRef.put(file);
+                const url = await snapshot.ref.getDownloadURL();
+                return url;
+            } catch (error) {
+                console.error("Upload error:", error);
+                await customAlert("Errore durante il caricamento del file.", "Errore Caricamento");
+                return null;
+            } finally {
+                setUploadState(false);
+            }
+        };
+
+        window.handleFileUpload = async (input, targetId) => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const path = `news/${Date.now()}_${file.name}`;
+            const url = await window.uploadToStorage(file, path);
+            if (url) {
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.value = url;
+                    target.dispatchEvent(new Event('input')); // Trigger update for blocks
+                }
+            }
+        };
+
+        function setUploadState(active) {
+            isUploading = active;
+            const saveBtn = document.querySelector('.btn-save');
+            if (saveBtn) {
+                saveBtn.disabled = active;
+                saveBtn.textContent = active ? 'Caricamento...' : 'Salva';
+            }
+        }
 
         // Block logic
         window.addBlock = (type, value = '') => {
@@ -273,10 +479,46 @@
                     inputHtml = `<input type="text" placeholder="Titolo..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
                 } else if (b.type === 'img') {
                     typeColor = "#3182ce";
-                    inputHtml = `<input type="text" placeholder="Incolla URL Immagine..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                    inputHtml = `
+                        <div class="input-with-upload">
+                            <input type="text" id="input-${b.id}" placeholder="Incolla URL Immagine..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">
+                            <button type="button" class="btn-upload-small" style="background:var(--atsom-dark-blue); border-color:var(--atsom-dark-blue); color:white;" onclick="window.openCloudSelector('input-${b.id}', 'img')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                                Cloud
+                            </button>
+                            <label class="btn-upload-small">
+                                <input type="file" accept="image/*" onchange="window.handleFileUpload(this, 'input-${b.id}')" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                Carica
+                            </label>
+                        </div>`;
+                } else if (b.type === 'video') {
+                    typeColor = "#805ad5";
+                    inputHtml = `
+                        <div class="input-with-upload">
+                            <input type="text" id="input-${b.id}" placeholder="Incolla URL Video o Carica..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">
+                            <button type="button" class="btn-upload-small" style="background:var(--atsom-dark-blue); border-color:var(--atsom-dark-blue); color:white;" onclick="window.openCloudSelector('input-${b.id}', 'video')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                                Cloud
+                            </button>
+                            <label class="btn-upload-small">
+                                <input type="file" accept="video/*" onchange="window.handleFileUpload(this, 'input-${b.id}')" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                Carica
+                            </label>
+                        </div>`;
                 } else if (b.type === 'youtube') {
                     typeColor = "#e53e3e";
                     inputHtml = `<input type="text" placeholder="Incolla link YouTube (es: https://www.youtube.com/watch?v=...)" value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                } else if (b.type === 'instagram') {
+                    typeColor = "#d62976";
+                    inputHtml = `<input type="text" placeholder="Incolla link Instagram (es: https://www.instagram.com/p/...)" value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                } else if (b.type === 'facebook') {
+                    typeColor = "#3b5998";
+                    inputHtml = `<input type="text" placeholder="Incolla link Facebook (post o video)" value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                } else if (b.type === 'twitter') {
+                    typeColor = "#000000";
+                    inputHtml = `<input type="text" placeholder="Incolla link X (es: https://twitter.com/user/status/...)" value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
                 }
 
                 return `
@@ -339,6 +581,13 @@
                 if (!val) return '';
                 if (b.type === 'p') return `<p>${val}</p>`;
                 if (b.type === 'img') return `<img src="${val}" class="article-content-img" style="width:100%; border-radius:12px; margin: 1.5rem 0;">`;
+                if (b.type === 'video') return `
+                    <div class="article-video-wrapper" style="margin: 1.5rem 0;">
+                        <video controls style="width:100%; border-radius:12px; height:auto;">
+                            <source src="${val}" type="video/mp4">
+                            Il tuo browser non supporta il tag video.
+                        </video>
+                    </div>`;
                 if (b.type === 'youtube') {
                     const id = extractYouTubeId(val);
                     if (!id) return `<p style="color:red;">Link video non valido: ${val}</p>`;
@@ -353,6 +602,25 @@
                                 style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;">
                             </iframe>
                         </div>`;
+                }
+                if (b.type === 'instagram') {
+                    return `<div class="article-social-embed instagram-embed" style="margin: 1.5rem 0; display: flex; justify-content: center;">
+                        <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${val}" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
+                           <div style="padding:16px;"> <a href="${val}" style=" background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">Vedi su Instagram</a></div>
+                        </blockquote>
+                    </div>`;
+                }
+                if (b.type === 'twitter') {
+                    return `<div class="article-social-embed twitter-embed" style="margin: 1.5rem 0; display: flex; justify-content: center;">
+                        <blockquote class="twitter-tweet" data-theme="light">
+                            <a href="${val.replace('x.com', 'twitter.com')}">Caricamento tweet...</a>
+                        </blockquote>
+                    </div>`;
+                }
+                if (b.type === 'facebook') {
+                    return `<div class="article-social-embed facebook-embed" style="margin: 1.5rem 0; display: flex; justify-content: center;">
+                        <div class="fb-post" data-href="${val}" data-width="auto" data-show-text="true"></div>
+                    </div>`;
                 }
                 return `<${b.type}>${val}</${b.type}>`;
             }).join('\n');
@@ -384,6 +652,18 @@
                         const id = parts[parts.length - 1].split('?')[0];
                         addBlock('youtube', `https://www.youtube.com/watch?v=${id}`);
                     }
+                } else if (tag === 'div' && el.querySelector('video')) {
+                    const video = el.querySelector('video source');
+                    if (video) addBlock('video', video.getAttribute('src'));
+                } else if (el.classList.contains('instagram-embed')) {
+                    const bq = el.querySelector('blockquote');
+                    if (bq) addBlock('instagram', bq.getAttribute('data-instgrm-permalink'));
+                } else if (el.classList.contains('twitter-embed')) {
+                    const a = el.querySelector('blockquote a');
+                    if (a) addBlock('twitter', a.getAttribute('href'));
+                } else if (el.classList.contains('facebook-embed')) {
+                    const fb = el.querySelector('.fb-post');
+                    if (fb) addBlock('facebook', fb.getAttribute('data-href'));
                 }
             });
 
@@ -446,10 +726,48 @@
             document.getElementById('admin-section').style.display = 'flex';
             document.getElementById('user-info').textContent = `Loggato come: ${currentUser.id}`;
             loadNews();
+            loadMaintenanceStatus();
         }
+
+        async function loadMaintenanceStatus() {
+            try {
+                const status = await newsApi.getMaintenanceStatus();
+                const text = document.getElementById('status-maintenance-text');
+                if (text) {
+                    text.textContent = status.isMaintenance ? 'ON' : 'OFF';
+                    text.style.color = status.isMaintenance ? '#FF6B6B' : '#a0aec0';
+                }
+            } catch (err) {
+                console.error("Failed to load maintenance status:", err);
+            }
+        }
+
+        window.toggleMaintenanceUI = async () => {
+            try {
+                const status = await newsApi.getMaintenanceStatus();
+                const newState = !status.isMaintenance;
+                const msg = `Vuoi <strong>${newState ? 'ATTIVARE' : 'DISATTIVARE'}</strong> la modalità manutenzione?<br><br>Il sito pubblico verrà oscurato per tutti i visitatori e verrà mostrata la pagina di manutenzione.`;
+                if (await customConfirm(msg, "Impostazioni Sito", newState)) {
+                    await newsApi.updateMaintenanceStatus(newState);
+                    loadMaintenanceStatus();
+                }
+            } catch (err) {
+                await customAlert("Errore di connessione al database durante l'aggiornamento dello stato.", "Errore");
+                console.error(err);
+            }
+        };
 
         async function loadNews() {
             const news = await newsApi.getAllNewsAdmin();
+            
+            // Estrazione Tags cumulativi per Autocomplete
+            window.availableTags = new Set();
+            news.forEach(n => {
+                if(n.tags && Array.isArray(n.tags)) {
+                    n.tags.forEach(t => window.availableTags.add(t.trim()));
+                }
+            });
+
             const tbody = document.getElementById('news-table-body');
             tbody.innerHTML = news.map(n => {
                 const date = n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('it-IT') : '-';
@@ -517,7 +835,6 @@
                 document.getElementById('news-cover').value = news.coverImage || '';
                 document.getElementById('news-tags').value = (news.tags || []).join(', ');
                 document.getElementById('news-status').value = news.status || 'private';
-                document.getElementById('news-featured').checked = news.isFeatured || false;
                 document.getElementById('news-breaking').checked = news.isBreaking || false;
 
                 // Show Meta Info
@@ -568,7 +885,6 @@
                     return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
                 }).filter(s => s),
                 status: document.getElementById('news-status').value,
-                isFeatured: document.getElementById('news-featured').checked,
                 isBreaking: document.getElementById('news-breaking').checked,
                 updatedById: currentUser.username,
                 updatedBy: currentUser.id
@@ -592,16 +908,248 @@
                 closeEditor();
                 loadNews();
             } catch (err) {
-                alert("Errore durante il salvataggio: " + err.message);
+                await customAlert("Si è verificato un errore durante il salvataggio:<br>" + err.message, "Errore Salvataggio");
             }
         };
 
         window.confirmDelete = async (id) => {
-            if (confirm("Sei sicuro di voler eliminare questa notizia?")) {
+            if (await customConfirm("Sei sicuro di voler eliminare permanentemente questa notizia? Questa azione non può essere annullata.", "Eliminazione Notizia", true)) {
                 await newsApi.deleteNews(id);
                 loadNews();
             }
         };
+
+        window.switchAdminSection = (sectionName) => {
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+            // Remove active from any inner links if we added nav-notizie specific logic
+            const targetNav = document.getElementById('nav-' + sectionName);
+            if(targetNav) targetNav.classList.add('active');
+            
+            if(sectionName === 'notizie') {
+                document.getElementById('section-notizie').style.display = 'block';
+                document.getElementById('section-media').style.display = 'none';
+            } else if (sectionName === 'media') {
+                document.getElementById('section-notizie').style.display = 'none';
+                document.getElementById('section-media').style.display = 'block';
+                loadMediaLibrary();
+            }
+        };
+
+        window.loadMediaLibrary = async () => {
+            const tbody = document.getElementById('media-table-body');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 40px; color: var(--atsom-dark-grey);">Scansione server storage in corso...</td></tr>';
+            
+            try {
+                const storageRef = storage.ref();
+                const newsRef = storageRef.child('news');
+                const result = await newsRef.listAll();
+                
+                if(result.items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 40px; color: var(--atsom-dark-grey);">Nessun elemento presente nello storage.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                
+                // Fetch all sequentially to avoid overwhelming
+                for (const itemRef of result.items) {
+                    try {
+                        const url = await itemRef.getDownloadURL();
+                        const isVideo = itemRef.name.toLowerCase().endsWith('.mp4');
+                        
+                        const tr = document.createElement('tr');
+                        
+                        tr.innerHTML = `
+                            <td style="text-align:center; vertical-align:middle; width:80px;">
+                                <div style="width: 60px; height: 60px; border-radius: 6px; overflow: hidden; background: #f7fafc; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid #edf2f7; margin:auto;" onclick="window.open('${url}', '_blank')">
+                                    ${isVideo 
+                                        ? '<span style="font-size:0.7rem; font-weight:bold; color:#718096;">MP4</span>' 
+                                        : `<img src="${url}" style="width:100%; height:100%; object-fit:cover;" alt="preview">`}
+                                </div>
+                            </td>
+                            <td style="vertical-align:middle;">
+                                <div style="font-weight: 600; color: #2d3748; word-break: break-all;">${itemRef.name}</div>
+                            </td>
+                            <td style="text-align:right; vertical-align:middle; width:100px;">
+                                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                                    <button class="action-btn" onclick="window.open('${url}', '_blank')" title="Apri Originale">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    </button>
+                                    <button class="btn-delete-media" onclick="safeDeleteMedia('${itemRef.name}', '${itemRef.fullPath}')" title="Elimina defnitivamente">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    } catch(e) {
+                        console.error('Failed to prepare item', itemRef.name, e);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 40px; color: red;">Errore di connessione Firebase Storage: ${err.message}</td></tr>`;
+            }
+        };
+
+        window.safeDeleteMedia = async (fileName, fullPath) => {
+            // 1. Fetch all published news directly from API
+            const allNews = await newsApi.getAllNewsAdmin();
+            const stringifiedNews = JSON.stringify(allNews);
+            const encodedName = encodeURIComponent(fileName);
+            
+            // 2. Check if file is mentioned anywhere
+            if (stringifiedNews.includes(fileName) || stringifiedNews.includes(encodedName)) {
+                
+                const usedIn = allNews.filter(n => {
+                    const str = JSON.stringify(n);
+                    return str.includes(fileName) || str.includes(encodedName);
+                });
+                
+                const titlesList = usedIn.map(n => `- ${n.title}`).join('<br>');
+                const warningMsg = `<strong style="color:#e53e3e;">AVVISO DI SICUREZZA:</strong><br><br>Questo file ("<strong>${fileName}</strong>") è attualmente utilizzato nelle seguenti notizie:<br><br>${titlesList}<br><br>Sei SICURO di voler forzare l'eliminazione? Questo rimuoverà il file per sempre rimpiazzandolo con errori grafici in questi articoli.`;
+                
+                if (!(await customConfirm(warningMsg, "File in Uso", true))) return; // user aborted
+            } else {
+                if (!(await customConfirm(`Sei sicuro di voler eliminare dal server il file "<strong>${fileName}</strong>"?<br><br>L'operazione è irreversibile e libererà lo spazio sul cloud.`, "Conferma Eliminazione", true))) {
+                    return;
+                }
+            }
+            
+            try {
+                await storage.ref().child(fullPath).delete(); // Perform permanent deletion
+                loadMediaLibrary(); // Refresh grid view
+            } catch(e) {
+                await customAlert("Errore durante l'eliminazione: " + e.message, "Errore Eliminazione");
+            }
+        };
+
+        window.handleMediaDragDrop = async (files) => {
+            if (!files || files.length === 0) return;
+            const progressEl = document.getElementById('media-upload-progress');
+            progressEl.style.display = 'block';
+            progressEl.textContent = `Caricamento in corso... (0/${files.length})`;
+
+            let successCount = 0;
+            const maxSize = 20 * 1024 * 1024; // 20 MB
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.size > maxSize) {
+                    await customAlert(`Il file "<strong>${file.name}</strong>" supera il limite di 20MB ed è stato scartato.`, "File Troppo Grande");
+                    continue;
+                }
+                const path = `news/${Date.now()}_${file.name}`;
+                try {
+                    progressEl.innerHTML = `Caricamento di "<strong>${file.name}</strong>" (${i+1}/${files.length})...`;
+                    await window.uploadToStorage(file, path);
+                    successCount++;
+                } catch(e) {
+                    await customAlert(`Errore caricamento "${file.name}":<br>` + e.message, "Errore Caricamento");
+                }
+            }
+            
+            progressEl.textContent = "Caricamento completato!";
+            setTimeout(() => { progressEl.style.display = 'none'; }, 2000);
+            
+            if(successCount > 0) {
+               await loadMediaLibrary();
+            }
+        };
+
+        window.openCloudSelector = async (targetId, filterType) => {
+            const modal = document.getElementById('cloud-selector-modal');
+            const grid = document.getElementById('cloud-selector-grid');
+            
+            document.getElementById('cloud-selector-title').textContent = filterType === 'video' ? 'Seleziona Video dal Cloud' : 'Seleziona Immagine dal Cloud';
+            modal.style.display = 'flex';
+            grid.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--atsom-dark-grey); grid-column: 1 / -1;">Caricamento dal server in corso...</div>';
+            
+            try {
+                const result = await storage.ref().child('news').listAll();
+                grid.innerHTML = '';
+                
+                let foundMatch = false;
+                for (const itemRef of result.items) {
+                    const isVideo = itemRef.name.toLowerCase().endsWith('.mp4');
+                    if (filterType === 'video' && !isVideo) continue;
+                    if (filterType === 'img' && isVideo) continue;
+                    
+                    foundMatch = true;
+                    itemRef.getDownloadURL().then(url => {
+                        const card = document.createElement('div');
+                        card.className = 'cloud-media-card';
+                        card.onclick = () => {
+                            const target = document.getElementById(targetId);
+                            if (target) {
+                                target.value = url;
+                                target.dispatchEvent(new Event('input')); // trigger updateBlockValue auto-save
+                            }
+                            modal.style.display = 'none';
+                        };
+                        
+                        card.innerHTML = `
+                            <div class="cloud-media-preview">
+                                ${isVideo 
+                                    ? '<div class="video-placeholder" style="font-size:0.8rem;">VIDEO MP4</div>' 
+                                    : `<img src="${url}" loading="lazy">`}
+                            </div>
+                            <div class="cloud-media-name" title="${itemRef.name}">${itemRef.name}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+                setTimeout(() => {
+                    if (!foundMatch) {
+                        grid.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--atsom-dark-grey); grid-column: 1 / -1;">Nessun ${filterType === 'video' ? 'video' : 'immagine'} trovato nel cloud!</div>`;
+                    }
+                }, 1000); // delay allows async getDownloadURL to populate grid or fail
+            } catch (err) {
+                grid.innerHTML = `<div style="text-align:center; padding: 40px; color: red; grid-column: 1 / -1;">Errore cloud: ${err.message}</div>`;
+            }
+        };
+
+        // --- TAG AUTOCOMPLETE MODULE ---
+        const tagsInput = document.getElementById('news-tags');
+        const suggestionsBox = document.getElementById('tag-suggestions');
+
+        tagsInput.addEventListener('input', (e) => {
+            if (!window.availableTags) return;
+            const value = e.target.value;
+            const currentParts = value.split(',');
+            const currentWord = currentParts[currentParts.length - 1].trim().toLowerCase();
+            
+            if (currentWord.length < 1) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            
+            // Suggest matches based on word start (case insensitive)
+            const matches = Array.from(window.availableTags).filter(t => t.toLowerCase().startsWith(currentWord) && t.toLowerCase() !== currentWord);
+            
+            if (matches.length > 0) {
+                suggestionsBox.innerHTML = matches.map(m => `<div class="tag-suggestion-item" onclick="window.selectTag('${m.replace(/'/g, "\\'")}')">${m}</div>`).join('');
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        window.selectTag = (tag) => {
+            const currentParts = tagsInput.value.split(',');
+            currentParts.pop(); // remove partial typed entry
+            currentParts.push(' ' + tag); // append full tag name
+            tagsInput.value = currentParts.join(',').trim() + ', ';
+            suggestionsBox.style.display = 'none';
+            tagsInput.focus();
+        };
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== tagsInput && e.target !== suggestionsBox && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
 
         checkSession();
     </script>

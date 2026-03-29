@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categoria | ATSOMnews</title>
+
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Firebase SDK (Standard CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <link rel="stylesheet" href="news-style.css">
+    <style>
+        .category-card-item {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--atsom-navy, #1a1a2e);
+        }
+
+        .cat-card-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0f4f8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--atsom-navy, #1a1a2e);
+        }
+
+        .cat-card-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-news">
+
+        <!-- News Ticker Dinamico -->
+        <div class="news-ticker-container">
+            <div class="news-label">Ultime notizie</div>
+            <div class="news-scroll" id="breaking-news-ticker">
+                <span class="news-item">Caricamento notizie...</span>
+            </div>
+            <div class="user-icon-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Split Header Nav -->
+        <nav class="header-split">
+            <div class="header-btn header-logo-box radius-left">
+                <a href="index.html"><img src="atsom.png" alt="ATSOM Logo"></a>
+            </div>
+            <a href="https://atsom.org/chi-siamo.html" class="header-btn btn-chi-siamo radius-mid">Chi
+                siamo</a>
+            <a href="index.html" class="header-btn btn-news radius-mid active">ATSOMnews</a>
+            <a href="https://atsom.org/myAtsom.html" class="header-btn btn-myatsom radius-right">myATSOM</a>
+        </nav>
+
+        <!-- Category & Search Bar -->
+        <div class="category-bar">
+            <a href="index.html" class="cat-btn radius-left">Home</a>
+            <a href="categoria.html?cat=Metro" class="cat-btn radius-mid" id="cat-Metro">Metro</a>
+            <a href="categoria.html?cat=Autobus" class="cat-btn radius-mid" id="cat-Autobus">Autobus</a>
+            <a href="categoria.html?cat=Treni" class="cat-btn radius-mid" id="cat-Treni">Treni</a>
+            <a href="categoria.html?cat=Preferiti" class="cat-btn radius-mid" id="cat-Preferiti">Preferiti</a>
+            <a href="categoria.html?cat=Categorie" class="cat-btn radius-mid" id="cat-Categorie">Categorie</a>
+            <div class="search-pill radius-right">
+                <svg id="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="Cerca...">
+            </div>
+        </div>
+
+        <section>
+            <h1 class="section-title" id="page-title">Categoria: ...</h1>
+            <div id="news-grid" class="news-grid">
+                <!-- Data will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-figma">
+            <div class="footer-milan-box">
+                <img src="img/BasedInMilan.png" alt="Based in Milan" style="height: 40px;">
+                <img src="img/MilanSkylineHitachi.png" alt="Skyline" class="milan-graphic">
+            </div>
+            <div class="footer-legal-bar">
+                <div style="color: white; display: flex; align-items: center; gap: 16px;">
+                    <span>© ATSOM | Associazione Trasporti Sud-Ovest Milanese</span>
+                    <a href="https://www.instagram.com/atsom.milano" target="_blank" rel="noopener noreferrer"
+                        style="display: flex; align-items: center; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"
+                            style="opacity:0.8; flex-shrink:0;">
+                            <path
+                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <a href="legal.html#terms">Termini e Condizioni</a>
+                    <span style="opacity: 0.4;">|</span>
+                    <a href="legal.html#privacy">Informativa sulla privacy</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Firebase Config & API -->
+    <script src="firebase-config.js" type="module"></script>
+    <script type="module">
+        import { newsApi } from './news-api.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const cat = urlParams.get('cat') || 'Tutte';
+        const searchQuery = urlParams.get('search');
+
+        if (searchQuery) {
+            document.getElementById('page-title').textContent = `Risultati ricerca: ${searchQuery}`;
+        } else {
+            document.getElementById('page-title').textContent = `Categoria: ${cat}`;
+            const activeBtn = document.getElementById(`cat-${cat}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        async function initPage() {
+            const grid = document.getElementById('news-grid');
+            
+            // Search Logic (Global)
+            const searchInput = document.getElementById('search-input');
+            const searchIcon = document.getElementById('search-icon');
+            
+            const handleSearch = () => {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `categoria.html?search=${encodeURIComponent(query)}`;
+                }
+            };
+
+            if (searchInput && searchIcon) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleSearch();
+                });
+                searchIcon.onclick = handleSearch;
+            }
+
+            // Reset grid styles to default (from CSS)
+            grid.style.display = '';
+            grid.style.gridTemplateColumns = '';
+            grid.style.gap = '';
+
+            // Admin Link
+            const adminBtn = document.querySelector('.user-icon-btn');
+            if (adminBtn) {
+                adminBtn.style.cursor = 'pointer';
+                adminBtn.onclick = () => window.location.href = 'admin.html';
+            }
+
+            // --- CATEGORIES LIST VIEW ---
+            if (cat === 'Categorie') {
+                document.getElementById('page-title').textContent = "Tutte le Categorie";
+                const allTags = await newsApi.getAllTags();
+
+                if (allTags.length === 0) {
+                    grid.innerHTML = `<p>Nessuna categoria trovata.</p>`;
+                    return;
+                }
+
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                grid.style.gap = '20px';
+
+                const favoritesCard = `
+                    <div class="category-card-item" onclick="window.location.href='categoria.html?cat=Preferiti'" style="border-color: var(--atsom-coral); background: #fffcfc;">
+                        <div class="cat-card-icon" style="background: #fff5f5; color: var(--atsom-coral);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                        </div>
+                        <div class="cat-card-name">I tuoi Preferiti</div>
+                    </div>
+                `;
+
+                grid.innerHTML = favoritesCard + allTags.map(tag => `
+                    <div class="category-card-item" onclick="window.location.href='categoria.html?cat=${tag}'">
+                        <div class="cat-card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                        </div>
+                        <div class="cat-card-name">${tag}</div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            // --- FAVORITES VIEW ---
+            if (cat === 'Preferiti') {
+                document.getElementById('page-title').textContent = "I tuoi Preferiti";
+                const savedIds = JSON.parse(localStorage.getItem('atsom_saved_news') || '[]');
+
+                if (savedIds.length === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #718096;">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 20px; opacity: 0.3;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                            <p style="font-size: 1.1rem; font-weight: 600;">Non hai ancora salvato nessuna notizia.</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">Le notizie che salvi appariranno qui!</p>
+                            <a href="index.html" class="cat-btn" style="display:inline-flex; border-radius:100px; margin-top: 25px; padding: 0 30px; background: var(--atsom-navy);">Torna alla Home</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Fetch details for each saved ID
+                const favoriteNews = await Promise.all(savedIds.map(id => newsApi.getNewsById(id)));
+                const validNews = favoriteNews.filter(n => n !== null);
+
+                if (validNews.length === 0) {
+                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 40px; opacity: 0.6;">Le notizie salvate non sono più disponibili.</p>`;
+                    return;
+                }
+
+                renderNewsGrid(validNews);
+                return;
+            }
+
+            // --- SEARCH VIEW ---
+            if (searchQuery) {
+                const results = await newsApi.searchNews(searchQuery);
+                if (results.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #718096;">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 20px; opacity: 0.3;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <p style="font-size: 1.1rem; font-weight: 600;">Nessun risultato trovato per "${searchQuery}".</p>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">Prova con parole chiave diverse o controlla gli errori di battitura.</p>
+                    </div>`;
+                    return;
+                }
+                renderNewsGrid(results);
+                return;
+            }
+
+            // --- SPECIFIC CATEGORY VIEW ---
+            // 1. Ticker Dinamico
+            async function updateTicker() {
+                const tickerContainer = document.getElementById('breaking-news-ticker');
+                const news = await newsApi.getLatestNews(5);
+                if (news.length > 0) {
+                    tickerContainer.innerHTML = '';
+                    news.forEach(item => {
+                        const span = document.createElement('span');
+                        span.className = 'news-item';
+                        span.textContent = `ATSOMnews: ${item.title} • `;
+                        span.onclick = () => window.location.href = `notizia.html?id=${item.id}`;
+                        tickerContainer.appendChild(span);
+                    });
+                }
+            }
+            updateTicker();
+
+            // Grid filtered
+            const filteredNews = await newsApi.getNewsByCategory(cat);
+
+            if (filteredNews.length === 0) {
+                grid.innerHTML = `<p>Nessuna notizia trovata per questa categoria.</p>`;
+                return;
+            }
+
+            renderNewsGrid(filteredNews);
+        }
+
+        function renderNewsGrid(newsList) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = newsList.map(item => {
+                const dateStr = item.publishedAt ? new Date(item.publishedAt.seconds * 1000).toLocaleString('it-IT') : '';
+                return `
+                    <div class="news-card" onclick="window.location.href='notizia.html?id=${item.id}'">
+                        <div class="card-img-wrapper">
+                            <img src="${item.coverImage}" alt="${item.title}">
+                            <div class="card-tags">
+                                ${(item.tags || []).map(t => `<span class="tag-pill">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3>${item.title}</h3>
+                            <div class="news-date">${dateStr} • ${item.readingTime || '1 min'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        initPage();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATSOMnews Admin Panel</title>
+    
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Standard CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body class="admin-body">
+
+    <!-- Login Section -->
+    <div id="login-section" class="admin-login-container">
+        <div class="login-card">
+            <img src="atsom.png" alt="atsom logo">
+            <h1>Admin Panel</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Inserisci username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Inserisci password" required>
+                </div>
+                <button type="submit" class="btn-login">Accedi</button>
+            </form>
+            <p id="login-error" style="color: red; margin-top: 1rem; display: none;">Credenziali non valide.</p>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Section -->
+    <div id="admin-section" style="display: none; width: 100%; height: 100vh; flex-direction: row;">
+        
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <img src="atsom.png" alt="logo" class="sidebar-logo">
+            <div class="sidebar-nav">
+                <div class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Dashboard
+                </div>
+                <div class="nav-item" onclick="logout()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </div>
+            </div>
+            <div id="user-info" style="margin-top: auto; font-size: 0.8rem; opacity: 0.7;">
+                <!-- Filled via JS -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2>Notizie</h2>
+                <button class="btn-add" onclick="openEditor()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Nuova Notizia
+                </button>
+            </header>
+
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Titolo</th>
+                            <th>Creatore</th>
+                            <th>Ultima Modifica</th>
+                            <th>Stato</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="news-table-body">
+                        <!-- Filled via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Editor Overlay (Modal) -->
+    <div id="editor-overlay" class="editor-overlay">
+        <div class="editor-modal">
+            <header class="editor-header">
+                <h3 id="editor-title">Nuova Notizia</h3>
+                <button class="action-btn" onclick="closeEditor()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </header>
+            <div class="editor-body">
+                <form id="news-form" class="grid-2">
+                    <div class="form-group full-width">
+                        <label for="news-title">Titolo</label>
+                        <input type="text" id="news-title" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="news-subtitle">Sottotitolo</label>
+                        <input type="text" id="news-subtitle">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="news-summary">Sommario (per home page)</label>
+                        <textarea id="news-summary" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Contenuto della Notizia</label>
+                        <div id="content-builder" class="content-builder">
+                            <!-- Blocks will be added here -->
+                        </div>
+                        <div class="add-block-btns">
+                            <button type="button" class="btn-add-block" onclick="addBlock('p')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3H7a4 4 0 1 0 0 8h10a4 4 0 1 1 0 8H7"></path></svg>
+                                Paragrafo
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('h2')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 12h12M6 20V4M18 20V4"></path></svg>
+                                Titolo (H2)
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('h3')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h8M4 18V6M12 18V6M17 12h5M17 18V6M22 18V6"></path></svg>
+                                Sottotitolo (H3)
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('img')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                Immagine
+                            </button>
+                            <button type="button" class="btn-add-block" onclick="addBlock('youtube')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                                Video YouTube
+                            </button>
+                        </div>
+                        <button type="button" id="toggle-raw-btn" class="btn-raw-html" onclick="toggleRawMode()">Passa a HTML Manuale</button>
+                        <textarea id="news-content" style="display:none; margin-top:10px;" rows="6"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-cover">Immagine Principale (URL)</label>
+                        <input type="text" id="news-cover" placeholder="https://..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-tags">Tag (separati da virgola)</label>
+                        <input type="text" id="news-tags" placeholder="Milano, Metro, ...">
+                    </div>
+                    <div class="form-group">
+                        <label for="news-status">Stato</label>
+                        <select id="news-status">
+                            <option value="private">Privato (Bozza)</option>
+                            <option value="published">Pubblicato</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="news-featured"> In Evidenza (Hero Section)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                            <input type="checkbox" id="news-breaking"> Breaking News
+                        </label>
+                    </div>
+                    <!-- Meta Info Section -->
+                    <div id="editor-meta-info" class="form-group full-width" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85rem; color: #718096; display: none;">
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span>Creato da: <strong id="meta-created-by" style="color: #4a5568;">-</strong> il <span id="meta-created-at">-</span></span>
+                            <span>Ultima modifica: <strong id="meta-updated-by" style="color: #4a5568;">-</strong> il <span id="meta-updated-at">-</span></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <footer class="editor-footer">
+                <button class="btn-cancel" onclick="closeEditor()">Annulla</button>
+                <button class="btn-save" onclick="saveNews()">Salva</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Firebase Config & API -->
+    <script src="firebase-config.js" type="module"></script>
+    <script type="module">
+        import { newsApi } from './news-api.js';
+
+        let currentUser = null;
+        let editingId = null;
+        let contentBlocks = [];
+        let isRawMode = false;
+
+        // Block logic
+        window.addBlock = (type, value = '') => {
+            const id = Date.now() + Math.random().toString(36).substr(2, 9);
+            contentBlocks.push({ id, type, value });
+            renderBlocks();
+        };
+
+        window.removeBlock = (id) => {
+            contentBlocks = contentBlocks.filter(b => b.id !== id);
+            renderBlocks();
+        };
+
+        window.moveBlock = (id, dir) => {
+            const idx = contentBlocks.findIndex(b => b.id === id);
+            if (idx === -1) return;
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= contentBlocks.length) return;
+            const temp = contentBlocks[idx];
+            contentBlocks[idx] = contentBlocks[newIdx];
+            contentBlocks[newIdx] = temp;
+            renderBlocks();
+        };
+
+        function renderBlocks() {
+            const container = document.getElementById('content-builder');
+            container.innerHTML = contentBlocks.map((b, idx) => {
+                let inputHtml = "";
+                let typeColor = "#a0aec0";
+                
+                if (b.type === 'p') {
+                    inputHtml = `<textarea rows="3" placeholder="Testo del paragrafo..." oninput="updateBlockValue('${b.id}', this.value)">${b.value}</textarea>`;
+                } else if (b.type === 'h2' || b.type === 'h3') {
+                    inputHtml = `<input type="text" placeholder="Titolo..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                } else if (b.type === 'img') {
+                    typeColor = "#3182ce";
+                    inputHtml = `<input type="text" placeholder="Incolla URL Immagine..." value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                } else if (b.type === 'youtube') {
+                    typeColor = "#e53e3e";
+                    inputHtml = `<input type="text" placeholder="Incolla link YouTube (es: https://www.youtube.com/watch?v=...)" value="${b.value}" oninput="updateBlockValue('${b.id}', this.value)">`;
+                }
+
+                return `
+                <div class="content-block" data-id="${b.id}">
+                    <div class="block-type-label" style="color:${typeColor}">${b.type}</div>
+                    <div class="block-input-container">
+                        ${inputHtml}
+                    </div>
+                    <div class="block-actions">
+                        <button class="action-btn" onclick="moveBlock('${b.id}', -1)" ${idx === 0 ? 'disabled' : ''}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </button>
+                        <button class="action-btn" onclick="moveBlock('${b.id}', 1)" ${idx === contentBlocks.length - 1 ? 'disabled' : ''}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <button class="action-btn delete" onclick="removeBlock('${b.id}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+            
+            if (contentBlocks.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#a0aec0; margin:0;">Inizia ad aggiungere dei blocchi di testo...</p>';
+            }
+        }
+
+        window.updateBlockValue = (id, val) => {
+            const block = contentBlocks.find(b => b.id === id);
+            if (block) block.value = val;
+        };
+
+        window.toggleRawMode = () => {
+            isRawMode = !isRawMode;
+            const builder = document.getElementById('content-builder');
+            const btns = document.querySelector('.add-block-btns');
+            const textarea = document.getElementById('news-content');
+            const toggleBtn = document.getElementById('toggle-raw-btn');
+
+            if (isRawMode) {
+                textarea.value = getHTMLFromBlocks();
+                builder.style.display = 'none';
+                btns.style.display = 'none';
+                textarea.style.display = 'block';
+                toggleBtn.textContent = 'Passa a Editor Visuale';
+            } else {
+                parseHTMLToBlocks(textarea.value);
+                builder.style.display = 'block';
+                btns.style.display = 'flex';
+                textarea.style.display = 'none';
+                toggleBtn.textContent = 'Passa a HTML Manuale';
+                renderBlocks();
+            }
+        };
+
+        function getHTMLFromBlocks() {
+            return contentBlocks.map(b => {
+                const val = b.value.trim();
+                if (!val) return '';
+                if (b.type === 'p') return `<p>${val}</p>`;
+                if (b.type === 'img') return `<img src="${val}" class="article-content-img" style="width:100%; border-radius:12px; margin: 1.5rem 0;">`;
+                if (b.type === 'youtube') {
+                    const id = extractYouTubeId(val);
+                    if (!id) return `<p style="color:red;">Link video non valido: ${val}</p>`;
+                    return `
+                        <div class="article-video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; margin: 1.5rem 0;">
+                            <iframe 
+                                src="https://www.youtube-nocookie.com/embed/${id}" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen
+                                style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;">
+                            </iframe>
+                        </div>`;
+                }
+                return `<${b.type}>${val}</${b.type}>`;
+            }).join('\n');
+        }
+
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function parseHTMLToBlocks(html) {
+            contentBlocks = [];
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            Array.from(tempDiv.children).forEach(el => {
+                const tag = el.tagName.toLowerCase();
+                if (['p', 'h2', 'h3'].includes(tag)) {
+                    addBlock(tag, el.innerHTML);
+                } else if (tag === 'img') {
+                    addBlock('img', el.getAttribute('src'));
+                } else if (el.classList.contains('article-video-wrapper')) {
+                    const iframe = el.querySelector('iframe');
+                    if (iframe) {
+                        const src = iframe.getAttribute('src');
+                        // Split logic to extract ID from either youtube.com or youtube-nocookie.com
+                        const parts = src.split('/');
+                        const id = parts[parts.length - 1].split('?')[0];
+                        addBlock('youtube', `https://www.youtube.com/watch?v=${id}`);
+                    }
+                }
+            });
+            
+            // If empty after parsing, maybe it's just raw text
+            if (contentBlocks.length === 0 && html.trim()) {
+                addBlock('p', html);
+            }
+        }
+
+        function calculateReadingTime(html) {
+            const text = html.replace(/<[^>]*>?/gm, ' ');
+            const words = text.trim().split(/\s+/).filter(s => s).length;
+            const rawMin = words / 200;
+            
+            if (rawMin < 0.4) return "meno di 1 min";
+            
+            const intPart = Math.floor(rawMin);
+            const decPart = rawMin - intPart;
+            
+            if (decPart >= 0.2 && decPart <= 0.8) {
+                return (intPart === 0 ? "meno di un minuto" : intPart + (intPart === 1 ? " min" : " min") + " e mezzo");
+            }
+            
+            const finalMin = Math.round(rawMin);
+            return finalMin + (finalMin === 1 ? " min" : " min");
+        }
+
+        // Check for session
+        function checkSession() {
+            const savedUser = localStorage.getItem('atsom_admin');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showAdmin();
+            }
+        }
+
+        // Login UI logic
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            const result = await newsApi.login(user, pass);
+            if (result) {
+                currentUser = result;
+                localStorage.setItem('atsom_admin', JSON.stringify(currentUser));
+                showAdmin();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        };
+
+        window.logout = () => {
+            localStorage.removeItem('atsom_admin');
+            location.reload();
+        };
+
+        function showAdmin() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('admin-section').style.display = 'flex';
+            document.getElementById('user-info').textContent = `Loggato come: ${currentUser.id}`;
+            loadNews();
+        }
+
+        async function loadNews() {
+            const news = await newsApi.getAllNewsAdmin();
+            const tbody = document.getElementById('news-table-body');
+            tbody.innerHTML = news.map(n => {
+                const date = n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('it-IT') : '-';
+                const modDate = n.updatedAt ? new Date(n.updatedAt.seconds * 1000).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+                
+                // Compatibility with old "authorName" field
+                const creator = n.createdBy || n.authorName || 'Sconosciuto';
+                const modifier = n.updatedBy || creator;
+                
+                const statusClass = n.status === 'published' ? 'status-published' : 'status-private';
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td style="font-weight:600;">${n.title}</td>
+                        <td style="font-size: 0.85rem; opacity: 0.8;">${creator}</td>
+                        <td style="font-size: 0.85rem; opacity: 0.8;">
+                            <div style="display:flex; flex-direction:column;">
+                                <span>${modifier}</span>
+                                <small style="opacity:0.6;">${modDate}</small>
+                            </div>
+                        </td>
+                        <td><span class="status-badge ${statusClass}">${n.status}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn" onclick="openEditor('${n.id}')">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button class="action-btn" onclick="window.open('notizia.html?id=${n.id}', '_blank')">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                                <button class="action-btn delete" onclick="confirmDelete('${n.id}')">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.openEditor = async (id = null) => {
+            editingId = id;
+            const overlay = document.getElementById('editor-overlay');
+            const form = document.getElementById('news-form');
+            form.reset();
+            
+            if (id) {
+                document.getElementById('editor-title').textContent = "Modifica Notizia";
+                const news = await newsApi.getNewsById(id);
+                document.getElementById('news-title').value = news.title || '';
+                document.getElementById('news-subtitle').value = news.subtitle || '';
+                document.getElementById('news-summary').value = news.summary || '';
+                
+                // Content
+                const content = news.content || '';
+                document.getElementById('news-content').value = content;
+                isRawMode = false;
+                parseHTMLToBlocks(content);
+                document.getElementById('content-builder').style.display = 'block';
+                document.querySelector('.add-block-btns').style.display = 'flex';
+                document.getElementById('news-content').style.display = 'none';
+                document.getElementById('toggle-raw-btn').textContent = 'Passa a HTML Manuale';
+                renderBlocks();
+
+                document.getElementById('news-cover').value = news.coverImage || '';
+                document.getElementById('news-tags').value = (news.tags || []).join(', ');
+                document.getElementById('news-status').value = news.status || 'private';
+                document.getElementById('news-featured').checked = news.isFeatured || false;
+                document.getElementById('news-breaking').checked = news.isBreaking || false;
+
+                // Show Meta Info
+                const metaInfo = document.getElementById('editor-meta-info');
+                const creator = news.createdBy || news.authorName || 'Sconosciuto';
+                const createdAt = news.createdAt ? new Date(news.createdAt.seconds * 1000).toLocaleString('it-IT') : '-';
+                const modifier = news.updatedBy || creator;
+                const updatedAt = news.updatedAt ? new Date(news.updatedAt.seconds * 1000).toLocaleString('it-IT') : '-';
+                
+                document.getElementById('meta-created-by').textContent = creator;
+                document.getElementById('meta-created-at').textContent = createdAt;
+                document.getElementById('meta-updated-by').textContent = modifier;
+                document.getElementById('meta-updated-at').textContent = updatedAt;
+                metaInfo.style.display = 'block';
+            } else {
+                document.getElementById('editor-title').textContent = "Nuova Notizia";
+                document.getElementById('editor-meta-info').style.display = 'none';
+                contentBlocks = [];
+                isRawMode = false;
+                renderBlocks();
+                document.getElementById('content-builder').style.display = 'block';
+                document.querySelector('.add-block-btns').style.display = 'flex';
+                document.getElementById('news-content').style.display = 'none';
+            }
+            
+            overlay.style.display = 'flex';
+        };
+
+        window.closeEditor = () => {
+            document.getElementById('editor-overlay').style.display = 'none';
+        };
+
+        window.saveNews = async () => {
+            const finalContent = isRawMode ? document.getElementById('news-content').value : getHTMLFromBlocks();
+            const readingTime = calculateReadingTime(finalContent);
+            
+            const data = {
+                title: document.getElementById('news-title').value,
+                subtitle: document.getElementById('news-subtitle').value,
+                summary: document.getElementById('news-summary').value,
+                content: finalContent,
+                readingTime: readingTime,
+                coverImage: document.getElementById('news-cover').value,
+                tags: document.getElementById('news-tags').value.split(',').map(s => {
+                    const trimmed = s.trim();
+                    if (!trimmed) return "";
+                    // Capitalize first letter (e.g. metro -> Metro)
+                    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+                }).filter(s => s),
+                status: document.getElementById('news-status').value,
+                isFeatured: document.getElementById('news-featured').checked,
+                isBreaking: document.getElementById('news-breaking').checked,
+                updatedById: currentUser.username,
+                updatedBy: currentUser.id
+            };
+
+            // If it's a new news item, also set creator fields
+            if (!editingId) {
+                data.createdById = currentUser.username;
+                data.createdBy = currentUser.id;
+                // Keep authorId/authorName for backwards compatibility
+                data.authorId = currentUser.username;
+                data.authorName = currentUser.id;
+            }
+
+            try {
+                if (editingId) {
+                    await newsApi.updateNews(editingId, data);
+                } else {
+                    await newsApi.createNews(data);
+                }
+                closeEditor();
+                loadNews();
+            } catch (err) {
+                alert("Errore durante il salvataggio: " + err.message);
+            }
+        };
+
+        window.confirmDelete = async (id) => {
+            if (confirm("Sei sicuro di voler eliminare questa notizia?")) {
+                await newsApi.deleteNews(id);
+                loadNews();
+            }
+        };
+
+        checkSession();
+    </script>
+</body>
+</html>

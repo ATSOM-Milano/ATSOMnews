@@ -1,0 +1,774 @@
+/**
+ * ATSOMnews Design System
+ * Inspired by the provided Figma screenshots.
+ */
+
+:root {
+    --atsom-navy: #11335C;
+    --atsom-coral: #FF6B6B;
+    --atsom-purple: #926DF7;
+    --atsom-blue: #71B3F5;
+    --atsom-white: #FFFFFF;
+    --atsom-grey: #F0F2F5;
+    --atsom-dark-grey: #4A4A4A;
+
+    --r-outer: 17px;
+    --r-inner: 4px;
+
+    --font-main: 'Montserrat', sans-serif;
+
+    --shadow-premium: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition-ios: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--atsom-grey);
+    color: var(--atsom-navy);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Corner Radius Trick Utility Classes --- */
+.radius-outer {
+    border-radius: var(--r-outer);
+}
+
+.radius-left {
+    border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer);
+}
+
+.radius-mid {
+    border-radius: var(--r-inner);
+}
+
+.radius-right {
+    border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner);
+}
+
+/* Horizontal Grouping for Radius Trick */
+.h-group {
+    display: flex;
+    gap: 6px;
+}
+
+/* --- Layout Components --- */
+.container-news {
+    width: 92%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+/* --- Header Elements --- */
+.news-ticker-container {
+    background: var(--atsom-navy);
+    height: 38px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    border-radius: var(--r-outer);
+    margin-bottom: 20px;
+}
+
+.news-label {
+    background: var(--atsom-coral);
+    color: white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    z-index: 10;
+    white-space: nowrap;
+    border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer);
+}
+
+.news-scroll {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker-scroll 30s linear infinite;
+    padding-left: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.news-item {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-right: 50px;
+    cursor: pointer;
+}
+
+@keyframes ticker-scroll {
+    0% {
+        transform: translateX(10%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.user-icon-btn {
+    width: 40px;
+    height: 40px;
+    background: var(--atsom-navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+/* Header / Profile Split Nav */
+.header-split {
+    display: flex;
+    gap: 6px;
+    height: 54px;
+    margin-bottom: 25px;
+}
+
+.header-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.header-btn:active {
+    transform: scale(0.98);
+}
+
+.header-btn.active {
+    border-bottom: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.header-logo-box {
+    background: var(--atsom-navy);
+    flex: 1;
+    justify-content: flex-start;
+    padding-left: 20px;
+    border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer);
+}
+
+.btn-chi-siamo {
+    background: var(--atsom-navy);
+}
+
+.btn-news {
+    background: var(--atsom-coral);
+}
+
+.btn-myatsom {
+    background: var(--atsom-purple);
+}
+
+/* Disable the press animation on the logo box — only the link/img should show feedback */
+.header-logo-box:active {
+    transform: none;
+}
+
+.header-logo-box a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.header-logo-box img {
+    height: 32px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.header-logo-box a:active img {
+    transform: scale(0.92);
+    opacity: 0.75;
+}
+
+.btn-chi-siamo {
+    background: var(--atsom-navy);
+}
+
+.btn-news {
+    background: var(--atsom-coral);
+}
+
+.btn-myatsom {
+    background: var(--atsom-purple);
+}
+
+/* Category Selector Bar */
+.category-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.category-bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Safari/Chrome */
+
+.cat-btn {
+    height: 38px;
+    padding: 0 18px;
+    background: var(--atsom-navy);
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.cat-btn.active {
+    background: var(--atsom-blue);
+}
+
+.search-pill {
+    background: var(--atsom-navy);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    height: 38px;
+}
+
+.search-pill input {
+    background: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-style: italic;
+    flex: 1;
+    margin-left: 8px;
+}
+
+.search-pill svg {
+    color: white;
+    opacity: 0.7;
+}
+
+/* --- Content Sections --- */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+/* Hero / Featured Card */
+.hero-news-card {
+    background: var(--atsom-navy);
+    border-radius: var(--r-outer);
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 40px;
+    min-height: 240px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s var(--transition-ios);
+}
+
+.hero-news-card:hover {
+    transform: translateY(-4px);
+}
+
+.hero-img-box {
+    flex: 0.9;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+/* Used for accessibility/preload */
+
+.hero-content {
+    flex: 1.1;
+    padding: 24px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-content h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.hero-content .summary {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hero-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.news-date {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.tag-list {
+    display: flex;
+    gap: 6px;
+}
+
+.tag-pill {
+    background: white;
+    color: var(--atsom-navy);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+/* News Grid */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 60px;
+}
+
+.news-card {
+    background: var(--atsom-navy);
+    border-radius: var(--r-outer);
+    overflow: hidden;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s var(--transition-ios);
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+}
+
+.card-img-wrapper {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-tags {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 4px;
+}
+
+.card-body {
+    padding: 16px 20px;
+}
+
+.card-body h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+/* Article Page Layout */
+.article-container {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+}
+
+.article-main {
+    background: white;
+    border-radius: var(--r-outer);
+    padding: 40px;
+}
+
+.article-hero-img {
+    width: 100%;
+    border-radius: var(--r-outer);
+    margin-bottom: 30px;
+}
+
+.article-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 15px;
+    line-height: 1.1;
+}
+
+.article-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--atsom-dark-grey);
+}
+
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.article-content p {
+    margin-bottom: 20px;
+}
+
+/* Sticky Article Panel */
+.sticky-panel-container {
+    position: relative;
+}
+
+.sticky-panel {
+    position: sticky;
+    top: 20px;
+    background: var(--atsom-navy);
+    border-radius: var(--r-outer);
+    padding: 24px;
+    color: white;
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    opacity: 0.7;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: white;
+    width: 0%;
+    border-radius: 100px;
+}
+
+.actions-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    color: var(--atsom-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Footer */
+.footer-figma {
+    background: var(--atsom-navy);
+    border-radius: var(--r-outer);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.footer-milan-box {
+    padding: 18px 30px;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.footer-milan-box img.milan-graphic {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 90%;
+    opacity: 0.25;
+}
+
+.footer-legal-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .article-container {
+        grid-template-columns: 1fr;
+    }
+
+    .sticky-panel {
+        position: relative;
+        top: 0;
+        margin-bottom: 30px;
+    }
+
+    .hero-news-card {
+        flex-direction: column;
+    }
+
+    .hero-img-box {
+        height: 200px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+        gap: 4px;
+        margin-bottom: 20px;
+    }
+
+    .header-logo-box {
+        grid-column: 1 / -1;
+        border-radius: 17px 17px 4px 4px !important;
+        height: 48px;
+        padding-left: 18px;
+        justify-content: flex-start;
+    }
+
+    .header-btn {
+        height: 44px;
+        padding: 0 10px;
+        font-size: 0.78rem;
+    }
+
+    .btn-chi-siamo {
+        border-radius: 4px 4px 4px 17px !important;
+    }
+
+    .btn-news {
+        border-radius: 4px !important;
+    }
+
+    .btn-myatsom {
+        border-radius: 4px 4px 17px 4px !important;
+    }
+
+    .article-main {
+        padding: 24px;
+    }
+
+    .article-title {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .header-split {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .btn-chi-siamo {
+        border-radius: 4px 4px 4px 17px !important;
+    }
+
+    .btn-news {
+        border-radius: 4px 4px 17px 4px !important;
+    }
+
+    .btn-myatsom {
+        grid-column: 1 / -1;
+        border-radius: 4px 4px 17px 17px !important;
+    }
+}
+
+/* Toast Notification */
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--atsom-navy);
+    color: rgba(255, 255, 255, 0.95);
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: toast-in 0.4s var(--transition-ios), toast-out 0.4s var(--transition-ios) 2.6s forwards;
+}
+
+@keyframes toast-in {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toast-out {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+}
+
+.action-btn.active {
+    background: var(--atsom-coral) !important;
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Floating Top Bar (Mobile Article Only) */
+.floating-article-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--atsom-navy);
+    color: white;
+    height: 64px;
+    display: none;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 2000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-100%);
+    transition: transform 0.3s var(--transition-ios);
+}
+
+.floating-article-bar.visible {
+    transform: translateY(0);
+}
+
+.floating-bar-logo {
+    height: 28px;
+    margin-right: 12px;
+}
+
+.floating-bar-title {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 12px;
+}
+
+.floating-bar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.floating-action-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.floating-action-btn:active {
+    background: var(--atsom-coral);
+}
+
+.floating-action-btn.active {
+    background: var(--atsom-coral);
+}
+
+@media (max-width: 900px) {
+    .floating-article-bar {
+        display: flex;
+    }
+}

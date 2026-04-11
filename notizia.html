@@ -279,8 +279,9 @@
             // 2. Article Content
             const news = await newsApi.getNewsById(newsId);
             if (!news) {
-                alert("Notizia non trovata");
-                window.location.href = 'index.html';
+                console.error("Notizia non trovata");
+                document.getElementById('article-title').textContent = "Notizia non trovata";
+                document.getElementById('publish-date').textContent = "L'articolo cercato non è disponibile o è stato rimosso.";
                 return;
             }
             currentNews = news;

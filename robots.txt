@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+# Sitemap principale (pagine statiche)
+Sitemap: https://news.atsom.org/sitemap.xml
+
+# Sitemap notizie dinamica (Cloud Function)
+Sitemap: https://us-central1-atsomnews.cloudfunctions.net/sitemapNews

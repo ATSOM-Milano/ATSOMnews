@@ -4,7 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Base (aggiornati dinamicamente via JS) -->
     <title>Notizia | ATSOMnews</title>
+    <meta name="description" content="Leggi le ultime notizie sui trasporti di Milano su ATSOMnews.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://news.atsom.org/index.html" id="canonical-url">
+
+    <!-- Open Graph (WhatsApp, Telegram, Facebook) -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="ATSOMnews">
+    <meta property="og:title" content="Notizia | ATSOMnews" id="og-title">
+    <meta property="og:description" content="Leggi le ultime notizie sui trasporti di Milano su ATSOMnews." id="og-description">
+    <meta property="og:image" content="https://news.atsom.org/FavIconAtsom.png" id="og-image">
+    <meta property="og:url" content="https://news.atsom.org/index.html" id="og-url">
+    <meta property="article:published_time" content="" id="og-published">
+    <meta property="article:modified_time" content="" id="og-modified">
+    <meta property="article:author" content="ATSOM">
+    <meta property="article:publisher" content="https://news.atsom.org">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@atsom_milano">
+    <meta name="twitter:title" content="Notizia | ATSOMnews" id="tw-title">
+    <meta name="twitter:description" content="Leggi le ultime notizie sui trasporti di Milano su ATSOMnews." id="tw-description">
+    <meta name="twitter:image" content="https://news.atsom.org/FavIconAtsom.png" id="tw-image">
+
+    <!-- JSON-LD NewsArticle (iniettato via JS dopo caricamento notizia) -->
+    <script type="application/ld+json" id="jsonld-newsarticle">{}</script>
 
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -267,6 +294,71 @@
             document.getElementById('article-body').innerHTML = news.content;
             document.getElementById('floating-title').textContent = news.title;
             document.getElementById('like-count').textContent = news.likes || 0;
+
+            // --- SEO: Meta tag dinamici ---
+            const SITE_BASE = 'https://news.atsom.org';
+            const articleUrl = `${SITE_BASE}/notizia.html?id=${newsId}`;
+            const publishedISO = news.publishedAt
+                ? new Date(news.publishedAt.seconds * 1000).toISOString()
+                : new Date().toISOString();
+            const updatedISO = news.updatedAt
+                ? new Date(news.updatedAt.seconds * 1000).toISOString()
+                : publishedISO;
+            const description = news.summary || news.subtitle || `Leggi la notizia "${news.title}" su ATSOMnews.`;
+            const coverImage = news.coverImage || `${SITE_BASE}/FavIconAtsom.png`;
+
+            // Canonical & meta description
+            document.getElementById('canonical-url').href = articleUrl;
+            document.querySelector('meta[name="description"]').content = description;
+
+            // Open Graph
+            document.getElementById('og-title').content = `${news.title} | ATSOMnews`;
+            document.getElementById('og-description').content = description;
+            document.getElementById('og-image').content = coverImage;
+            document.getElementById('og-url').content = articleUrl;
+            document.getElementById('og-published').content = publishedISO;
+            document.getElementById('og-modified').content = updatedISO;
+
+            // Twitter Card
+            document.getElementById('tw-title').content = `${news.title} | ATSOMnews`;
+            document.getElementById('tw-description').content = description;
+            document.getElementById('tw-image').content = coverImage;
+
+            // JSON-LD NewsArticle
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "NewsArticle",
+                "headline": news.title,
+                "description": description,
+                "image": [coverImage],
+                "datePublished": publishedISO,
+                "dateModified": updatedISO,
+                "url": articleUrl,
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": articleUrl
+                },
+                "author": {
+                    "@type": "Organization",
+                    "name": "ATSOM",
+                    "url": "https://atsom.org"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "ATSOMnews",
+                    "url": SITE_BASE,
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": `${SITE_BASE}/FavIconAtsom.png`,
+                        "width": 512,
+                        "height": 512
+                    }
+                },
+                "keywords": (news.tags || []).join(', '),
+                "articleSection": (news.tags || [])[0] || 'Notizie'
+            };
+            document.getElementById('jsonld-newsarticle').textContent = JSON.stringify(jsonLd, null, 2);
+            // --- Fine SEO ---
 
             // Re-process social embeds
             setTimeout(() => {

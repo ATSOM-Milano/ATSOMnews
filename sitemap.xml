@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Sitemap delle pagine statiche -->
+  <sitemap>
+    <loc>https://news.atsom.org/sitemap-static.xml</loc>
+    <lastmod>2026-04-11</lastmod>
+  </sitemap>
+
+  <!-- Sitemap dinamica delle notizie (Cloud Function) -->
+  <sitemap>
+    <loc>https://us-central1-atsomnews.cloudfunctions.net/sitemapNews</loc>
+  </sitemap>
+
+</sitemapindex>

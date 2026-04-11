@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://news.atsom.org/index.html</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Categoria: Metro -->
+  <url>
+    <loc>https://news.atsom.org/categoria.html?cat=Metro</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Categoria: Autobus -->
+  <url>
+    <loc>https://news.atsom.org/categoria.html?cat=Autobus</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Categoria: Treni -->
+  <url>
+    <loc>https://news.atsom.org/categoria.html?cat=Treni</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tutte le categorie -->
+  <url>
+    <loc>https://news.atsom.org/categoria.html?cat=Categorie</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

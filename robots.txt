@@ -6,4 +6,4 @@ Disallow: /admin.html
 Sitemap: https://news.atsom.org/sitemap.xml
 
 # Sitemap notizie dinamica (Cloud Function)
-Sitemap: https://us-central1-atsomnews.cloudfunctions.net/sitemapNews
+Sitemap: https://sitemapnews-3zc5t5p77q-uc.a.run.app

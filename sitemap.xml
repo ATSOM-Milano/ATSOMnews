@@ -9,7 +9,7 @@
 
   <!-- Sitemap dinamica delle notizie (Cloud Function) -->
   <sitemap>
-    <loc>https://us-central1-atsomnews.cloudfunctions.net/sitemapNews</loc>
+    <loc>https://sitemapnews-3zc5t5p77q-uc.a.run.app</loc>
   </sitemap>
 
 </sitemapindex>
